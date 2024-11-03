@@ -5,6 +5,8 @@ import subprocess
 import shutil
 import glob
 import sys
+ 
+
 
 try:
     command = "taskkill /IM java.exe /F"
@@ -62,12 +64,20 @@ if os.path.exists('build'):
 def wait_for_file(file_path):
     while not os.path.exists(file_path):
         print(f"Aguardando a criação do arquivo: {file_path}...")
+        caminho_atual = os.getcwd()
+
+        # Extrai o nome da pasta
+        nome_pasta = os.path.basename(caminho_atual)
+
+        # Imprime o nome da pasta
+        print(nome_pasta)
         time.sleep(1)  # Espera 1 segundo antes de verificar novamente
 
 subprocess.run(["briefcase", "build", "android"], check=True)
 
 # Caminho do seu arquivo build.gradle
-file_path = r'build\canalqb\android\gradle\app\build.gradle'
+app_build = os.path.basename(os.getcwd())
+file_path = rf'build\{app_build}\android\gradle\app\build.gradle'
 
 wait_for_file(file_path)
 

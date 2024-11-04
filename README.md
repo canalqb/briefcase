@@ -64,6 +64,7 @@ Este script é mais simples e executa as seguintes tarefas:
 ### Funções Utilizadas no Script
 
 **Lembre-se de usar o OpenJDK em vez do Oracle JDK:**
+**xxxxxx é sua senha pessoa, minino de 6 caracteres**
 
 - **Criação da keystore**: keytool -genkeypair -v -keystore "canalqb.keystore" -alias canalqb -keyalg RSA -keysize 2048 -validity 10000 -storepass xxxxxx -dname "CN=canalqb, OU=canalqb, O=canalqb, L=Sao Paulo, ST=Sao Paulo, C=BR"
 - **Extração do certificado**: keytool -export -alias canalqb -keystore "canalqb.keystore" -file "canalqb_cert.crt" -storepass xxxxxx

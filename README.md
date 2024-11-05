@@ -41,6 +41,11 @@ Este script automatiza o processo de construção do seu aplicativo Android, ofe
   - `SeuArquivo-mt.st.0.0.1.aab`
   - `SeuArquivo-mf.sf.0.0.2.aab`
 
+- **exporta o symbols para a pasta dist**
+  - Descompacta o arquivo aab criado sem assinatura
+  - Copia os arquivos symbol para o aab
+  - Cria o arquivo com terminação **_symbol.aab**
+ 
 ### Versionamento
 
 Os arquivos são salvos com nomes internos de versão:

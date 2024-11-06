@@ -86,3 +86,12 @@ Este script é mais simples e executa as seguintes tarefas:
 *Deixe este arquivo na pasta `dist`.*
 Este é o arquivo fornecido pelo Google Play Console, extraído em novembro. Caso ocorra algum erro, pode ser necessário utilizar a versão diretamente do Google Play Console.
 
+
+github: [canalqb]
+Ou, se você usa outra plataforma, como Patreon, você pode configurar assim:
+ 
+patreon: [canalqb]
+Ou, para outras plataformas, use algo como: 
+
+opencollective: [canalqb]
+paypal: [qrodrigob@gmail.com]

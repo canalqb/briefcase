@@ -1,21 +1,43 @@
-# Ferramentas Desenvolvidas para Beeware + TOGA
+# Python 3.8 + BeeWare + Toga - Upando Seus aplicativos no Google Play Console
 
-Espero que estas ferramentas sejam úteis para você! Os scripts estão prontos para uso, e você está à vontade para modificá-los conforme necessário. Se estas ferramentas melhorarem sua experiência com o Beeware, considere se inscrever no meu canal no YouTube: [youtube.com/@canalqb](https://youtube.com/@canalqb).
+Galera, se esse script ajudar você de alguma forma, não se esqueça de seguir o [youtube.com/@canalqb](https://youtube.com/@canalqb).
+Sempre com uma novidade em Script e soluções de problemas para você.
+Vá no canal, e comente uma duvida, estou disposto a solucionar.
+Obrigado.
 
 ## Arquivos Disponíveis
 
-- `1.package_and_multisign.py`
-- `2.keystore_crt.py`
-- `pepk.jar`
+- `1. R8/proguard e Symbol.py`  
 
-## 1. package_and_multisign.py
+## 1. R8/proguard e Symbol.py
 
 *Deixe este script na raiz do projeto, na mesma pasta que o `pyproject.toml`.*
 
-Este script automatiza o processo de construção do seu aplicativo Android, oferecendo as seguintes funcionalidades:
+Como já sabemos o Google Console Play existe o SDK atualizado, no momento deste post, estamos falando do 34 (atualize no **pyproject.toml**)
+Vamos ao Script.
 
-- **Criação da Pasta de Build**: Gera a pasta `build` do Android na raiz do seu projeto utilizando o comando `briefcase build android`.
-- **Painel Interativo**: Apresenta um menu com quatro opções, permitindo que você escolha quais funcionalidades ativar. Você também pode passar um argumento para o script, por exemplo: `python 1.package_and_multisign.py 1`, para automatizar o processo.
+Usando o **briefcase build android** vamos criar a pasta build, podemos fazer as modificações necessárias.
+Usando o **briefcase package android** vamos criar o aab para postar no google play
+
+Então usando o comando
+O Script vai parar qualquer java.exe em execução, simplesmente encerrando o processo.
+no seu Script ele vai deletar a pasta Build, para criar uma nova, toda vez.
+
+`if os.path.exists('build'):`
+
+`    #Remove a pasta e todo seu conteúdo`
+
+`    shutil.rmtree('build')`
+
+O script simplesmente irá tratar 2 arquivos
+gradle\app\build.gradle e o gradle\gradle.properties
+
+Modificações dos 2 arquivos:
+- `Instalar o NDK 27`
+- `Alterar versões de arquivo AAB para tornar mais facil a visualização.`
+- `Criar e editar o minifyEnabled, shrinkResources para ser possivel realizar a ofuscação`
+- `Incluir o debugSymbolLevel para ser possivel a extração dos Symbol do seu aplicativo.`
+- `E criar alguns logs.`
 
 ### Funcionalidades
 
@@ -49,53 +71,37 @@ Este script automatiza o processo de construção do seu aplicativo Android, ofe
 ### Versionamento
 
 Os arquivos são salvos com nomes internos de versão:
-- `'1'`: `new_version_code = "100"` | `new_version_name = "0.0.1"`
-- `'2'`: `new_version_code = "200"` | `new_version_name = "0.0.2"`
-- `'3'`: `new_version_code = "300"` | `new_version_name = "0.0.3"`
-- `'4'`: `new_version_code = "400"` | `new_version_name = "0.0.4"`
+- `'1': new_version_code = "100"` | `new_version_name = "0.0.1"`
+- `'2': new_version_code = "200"` | `new_version_name = "0.0.2"`
+- `'3': new_version_code = "300"` | `new_version_name = "0.0.3"`
+- `'4': new_version_code = "400"` | `new_version_name = "0.0.4"`
 
-## 2. keystore_crt.py
+Você vai precisar o NDK atualizado, procure em https://developer.android.com/ndk/downloads
 
-*Deixe este script na raiz do projeto, na mesma pasta que o `pyproject.toml`.*
+Indico utilizar o OpenJava 17 que está configurado dentro do Beeware, para gerar as Keystore.
 
-Este script é mais simples e executa as seguintes tarefas:
-
-- Cria sua keystore.
-- Extrai o certificado da keystore criada.
-- Importa o certificado extraído para o `cacerts`.
-- Insere a keystore em seus arquivos `.aab`.
-- Cria um arquivo `output.zip` para o Google Play Console.
-
-### Funções Utilizadas no Script
-
-**Lembre-se de usar o OpenJDK em vez do Oracle JDK:**
-**xxxxxx é sua senha pessoa, minino de 6 caracteres**
-
-- **Criação da keystore**: keytool -genkeypair -v -keystore "canalqb.keystore" -alias canalqb -keyalg RSA -keysize 2048 -validity 10000 -storepass xxxxxx -dname "CN=canalqb, OU=canalqb, O=canalqb, L=Sao Paulo, ST=Sao Paulo, C=BR"
-- **Extração do certificado**: keytool -export -alias canalqb -keystore "canalqb.keystore" -file "canalqb_cert.crt" -storepass xxxxxx
-- **Listagem da keystore no cacerts**: keytool -list -keystore "c:\Program Files\Java\jdk-23\lib\security\cacerts" -storepass xxxxxx -alias canalqb
-- **Remoção do alias da keystore**: keytool -delete -alias canalqb -keystore "c:\Program Files\Java\jdk-23\lib\security\cacerts" -storepass xxxxxx 
-- **Importação do certificado para o cacerts**: keytool -import -alias canalqb -file "canalqb_cert.crt" -keystore "c:\Program Files\Java\jdk-23\lib\security\cacerts" -storepass xxxxxx 
-- **Assinatura do arquivo .aab**: jarsigner -verbose -sigalg SHA384withRSA -digestalg SHA-256 -keystore "C:\Users\34630737\Desktop\teste\canalqbpuzzle67\dist\canalqb.keystore" -storepass xxxxxx "CanalQb - Puzzle - 67-mt.st.0.0.1.aab" canalqb  
-- **Verificação da assinatura**: jarsigner -verify -verbose -certs "CanalQb - Puzzle - 67-mt.st.0.0.1.aab"
-- **Criação do output.zip**: java -jar pepk.jar --keystore=canalqb.keystore --alias=canalqb --output=output.zip --include-cert --rsa-aes-encryption --encryption-key-path=encryption_public_key.pem
+C:\\Users\\**{seuperfil}**\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\java17\\bin
 
 
-## pepk.jar
+Também devemos usar o android_sdk da mesma versão que o Google Play Console exige, neste momento é o 34, disponivel dentro do beeware.
 
-*Deixe este arquivo na pasta `dist`.*
-Este é o arquivo fornecido pelo Google Play Console, extraído em novembro. Caso ocorra algum erro, pode ser necessário utilizar a versão diretamente do Google Play Console.
-
-
-github: [canalqb] 
+C:\\Users\\**{seuperfil}**\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk\\build-tools\\34.0.0'
 
 
-patreon: [canalqb]
+Eu utilizei a versão 1.16 do bundletool: https://github.com/google/bundletool/releases/download/1.16.0/bundletool-all-1.16.0.jar
+O arquivo pem e o pepk.jar, você precisa pegar no Google Play Console 
 
+### Vamos aos comandos:
 
-opencollective: [canalqb]
+`keytool -genkeypair -v -keystore "alias.keystore" -alias "suaalias" -keyalg RSA -keysize 2048 -validity 10000 -storepass "xxxxxx" -dname "CN=canalqb, OU=canalqb, O=canalqb, L=Sao Paulo, ST=Sao Paulo, C=BR"`
 
+`java -jar bundletool-all-1.16.0.jar validate --bundle "**arquivo.aab**"`
 
-paypal: [qrodrigob@gmail.com]
+`apksigner sign --ks "**keystore**" --ks-pass pass:**senha_keystore** --min-sdk-version 34 "**arquivo.aab**"`
+
+Após concluir a criação do seu .aab, vamos usar os comandos abaixo para certificar para o Google Play Store
+
+`java -jar "pepk.jar" --keystore="**keystore**" --alias="**suaalias**" --output=output.zip --include-cert --rsa-aes-encryption --encryption-key-path="encryption_public_key.pem" --keystore-pass="xxxxxx"`
+
 
 

@@ -7,17 +7,7 @@ import requests
 import shutil
 import glob
 import sys 
-
-
-variavelcomalias = "canalqb"
-variavelcomnomedokeystore = f"{variavelcomalias}.keystore"
-variavelsenha = "xxxx" #Senha com 6 caracteres
-
-if len(variavelsenha) != 6:
-    print('Coloque uma senha de 6 caracteres na variavel variavelsenha que está na linha 14')
-    print('Enter a 6-character password in the variable variavelsenha on line 14')
-
-    exit()  # Sai do script
+ 
 
 try:
     command = "taskkill /IM java.exe /F"
@@ -27,6 +17,7 @@ except:
     
 # Função para renomear o arquivo
 def rename_file(option):
+    global dist_path
     # Caminho da pasta dist
     dist_path = 'dist'
     # Padrão para encontrar o arquivo
@@ -340,6 +331,7 @@ os.system('cls')
 # Caminho de origem (ajuste conforme necessário) 
 origem_simbolos = os.path.join('build', app_build, 'android', 'gradle', 'app', 'build', 'intermediates', 'merged_native_libs', 'release', 'out', 'lib')
 os.system('cls')
+
 if opcao == '1':
     nomepasta = '-mt.st.0.0.1.aab'
 elif opcao == '2':
@@ -350,6 +342,7 @@ elif opcao == '4':
     nomepasta = '-mf.st.0.0.4.aab'
 # Caminho de destino
 destino_simbolos = os.path.join('dist', f'simbolos{nomepasta}')
+print(destino_simbolos)
 
 # Função para copiar arquivos e pastas
 def copy_files(src, dest):
@@ -381,222 +374,30 @@ def copy_files(src, dest):
         print(f"Ocorreu um erro: {e}")
 
 # Chama a função para copiar os arquivos
-copy_files(origem_simbolos, destino_simbolos)
+copy_files(origem_simbolos, destino_simbolos) 
 
-#------------------------------------------------------------------------
-print(f'Descomprimindo {os.path.basename(nome_final_do_arquivo)}')
- 
-# Caminho do arquivo ZIP e destino da extração
-arquivo_zip = nome_final_do_arquivo
+# Exibindo as variáveis para garantir que os caminhos estão corretos
+para_zipar = destino_simbolos
+print(f'Esta é uma pasta que será zipada: {para_zipar}')
+print(f'Este é o nome do arquivo zip, precisa na pasta dist: {os.path.join(destino_simbolos)}')
 
-# Definir o diretório de destino (criando um diretório específico para extração)
-diretorio_destino = os.path.splitext(arquivo_zip)[0]  # Remove a extensão .aab para usar como pasta
+# Caminho do arquivo ZIP que será gerado
+# Agora você pode criar o caminho do arquivo ZIP em uma pasta acima da origem
+arquivo_zip = os.path.join(destino_simbolos, '..', 'simbolos-mt.st.0.0.1.zip')  # '..' navega uma pasta para cima
 
-# Verificar se o diretório de destino existe, se não, criar
-if not os.path.exists(diretorio_destino):
-    os.makedirs(diretorio_destino)
+# Normalizando o caminho para garantir que a pasta acima seja resolvida corretamente
+arquivo_zip = os.path.abspath(arquivo_zip)
 
-# Abrir o arquivo ZIP
-with zipfile.ZipFile(arquivo_zip, 'r') as zip_ref:
-    # Extrair todos os arquivos para o diretório de destino
-    zip_ref.extractall(diretorio_destino)
+# Exibindo o caminho do arquivo zip (só para conferirmos)
+print(f'O arquivo ZIP será salvo em: {arquivo_zip}')
 
-print(f'Arquivo {arquivo_zip} descompactado com sucesso em {diretorio_destino}')
+# Criando o arquivo zip
+with zipfile.ZipFile(arquivo_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    for root, dirs, files in os.walk(origem_simbolos):
+        for file in files:
+            # Caminho completo do arquivo
+            caminho_arquivo = os.path.join(root, file)
+            # Adicionando o arquivo ao zip sem a pasta intermediária
+            zipf.write(caminho_arquivo, os.path.relpath(caminho_arquivo, origem_simbolos))
 
-#------------------------------------------------------------------------
-print('Transferindo symbols')
- 
-
-# Definir o novo diretório para onde os arquivos serão copiados
-diretorio_destino = os.path.join(os.path.splitext(arquivo_zip)[0], 'BUNDLE-METADATA', 'com.android.tools.build.debugsymbols')
-
-# Criar o diretório com.android.tools.build.debugsymbols, se não existir
-if not os.path.exists(diretorio_destino):
-    os.makedirs(diretorio_destino)
-    print(f'Diretório criado: {diretorio_destino}')
-
-# Verificar se o diretório de origem existe
-if os.path.exists(destino_simbolos):
-    # Copiar todo o conteúdo do diretório de origem para o novo diretório
-    for item in os.listdir(destino_simbolos):
-        origem_item = os.path.join(destino_simbolos, item)
-        destino_item = os.path.join(diretorio_destino, item)
-        
-        if os.path.isdir(origem_item):
-            # Se for um diretório, copiamos recursivamente
-            shutil.copytree(origem_item, destino_item)
-            print(f'Pasta copiada: {origem_item} para {destino_item}')
-        else:
-            # Se for um arquivo, copiamos diretamente
-            shutil.copy2(origem_item, destino_item)
-            print(f'Arquivo copiado: {origem_item} para {destino_item}')
-else:
-    print(f'Erro: O diretório de origem não existe: {destino_simbolos}')
-
-#------------------------------------------------------------------------ 
-# Diretório que você deseja compactar
-diretorio_para_compactar = os.path.splitext(nome_final_do_arquivo)[0]  # Remove a extensão .aab para usar o nome da pasta
-
-# Definindo o nome da pasta corretamente
-nome_da_pasta = os.path.basename(diretorio_para_compactar)  # Extrai o nome da pasta
-
-# Construir o nome do arquivo .abb, combinando o nome da pasta e 'symbol' (exemplo: symbolCanalQb - Puzzle.abb)
-arquivo_abb = os.path.join(os.path.dirname(diretorio_para_compactar), f'{nome_da_pasta}_symbol.aab')
-
-# Verifique se o diretório existe
-if os.path.exists(diretorio_para_compactar):
-    # Compactar o diretório em formato .zip temporariamente
-    shutil.make_archive(diretorio_para_compactar, 'zip', diretorio_para_compactar)
-    
-    # Renomear o arquivo .zip para .abb com o nome correto
-    if os.path.exists(f'{diretorio_para_compactar}.zip'):
-        os.rename(f'{diretorio_para_compactar}.zip', arquivo_abb)
-        print(f'Diretório {diretorio_para_compactar} compactado e salvo com sucesso como {arquivo_abb}')
-        
-        # Deletar o diretório após a compactação
-        shutil.rmtree(diretorio_para_compactar)
-        print(f'Diretório {diretorio_para_compactar} deletado com sucesso.')
-    else:
-        print('Erro ao criar o arquivo .zip.')
-else:
-    print(f'Erro: O diretório {diretorio_para_compactar} não existe.')
-     
-# Variáveis do arquivo e keystore
-variavelcomnomedoarquivo = os.path.basename(nome_final_do_arquivo)
-
-
-# Diretório onde os arquivos serão salvos
-DIST_DIR = 'dist'
-
-# Função para rodar um comando no sistema
-def run_command(command, cwd=None):
-    try:
-        result = subprocess.run(command, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
-        print(result.stdout)
-        print(result.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"Erro ao executar o comando: {e}")
-        print(e.output)
-        print(e.stderr)
-
-# Função para obter o nome do usuário de forma compatível com diferentes sistemas operacionais
-def get_current_user():
-    return os.getenv('USERNAME') if os.name == 'nt' else os.getenv('USER') or os.getenv('LOGNAME')
-
-# Função para verificar e adicionar um diretório ao PATH se necessário
-def verify_and_add_to_path(directory, description):
-    if os.path.isdir(directory):
-        print(f'{description} encontrado em {directory}')
-        if directory not in os.environ['PATH']:
-            if input(f'O diretório {directory} não está no PATH. Deseja adicionar? (s/n): ').lower() == 's':
-                os.environ['PATH'] += f";{directory}"
-                print(f'{directory} adicionado ao PATH.')
-            else:
-                print(f'{directory} não foi adicionado ao PATH.')
-    else:
-        print(f'{description} não encontrado. Por favor, atualize o BeeWare.')
-
-# Função para verificar as versões e dependências
-def check_dependencies(env_user):
-    java_path = f'C:\\Users\\{env_user}\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\java17\\bin'
-    android_sdk_path = f'C:\\Users\\{env_user}\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk\\build-tools\\34.0.0'
-    verify_and_add_to_path(java_path, 'Java 17')
-    verify_and_add_to_path(android_sdk_path, 'Android SDK build-tools')
-
-# Função para baixar o BundleTool
-def download_bundletool():
-    bundletool_url = 'https://github.com/google/bundletool/releases/download/1.16.0/bundletool-all-1.16.0.jar'
-    
-    # Garantir que o diretório dist existe
-    os.makedirs(DIST_DIR, exist_ok=True)
-    
-    dist_path = os.path.join(DIST_DIR, 'bundletool-all-1.16.0.jar')
-    print(f'Downloading BundleTool para {dist_path}')
-    
-    response = requests.get(bundletool_url)
-    with open(dist_path, 'wb') as file:
-        file.write(response.content)
-    
-    print('Download do BundleTool concluído.')
-
-# Função para realizar a assinatura do APK
-def sign_apk(arquivo, keystore, alias, senha_keystore): 
-    command = f'apksigner sign --ks "{keystore}" --ks-pass pass:{senha_keystore} --min-sdk-version 34 "{arquivo}"'
-    run_command(command, cwd=DIST_DIR)
-
-# Função para validar o arquivo bundle
-def validate_bundle(arquivo):
-    command = f'java -jar bundletool-all-1.16.0.jar validate --bundle "{arquivo}"' 
-    run_command(command, cwd=DIST_DIR)
-
-# Função para gerar o arquivo zip com a chave de criptografia
-def generate_encryption_zip(keystore, alias, senha_keystore):
-    print("Baixando o pepk.jar...")
-
-    # URL do pepk.jar
-    pepk_url = "https://github.com/canalqb/briefcase/raw/refs/heads/main/pepk.jar"
-    
-    # Baixando pepk.jar diretamente para o diretório dist
-    pepk_path = os.path.join(DIST_DIR, 'pepk.jar')
-    response = requests.get(pepk_url)
-    with open(pepk_path, 'wb') as file:
-        file.write(response.content)
-
-    # Garantir que o arquivo pepk.jar foi baixado corretamente
-    pepk_path_abs = os.path.abspath(pepk_path)
-    if not os.path.exists(pepk_path_abs):
-        print(f"Erro: O arquivo pepk.jar não foi encontrado em {pepk_path_abs}")
-        return
-    
-    while not os.path.exists(os.path.join(DIST_DIR, 'encryption_public_key.pem')):
-        print("Acesse o Google Play Console para baixar sua pem atual e coloque na pasta dist.")
-        time.sleep(2)
-    
-    print("Executando o pepk.jar para gerar o arquivo output.zip")
-
-    # Caminho absoluto para o arquivo de chave pública
-    encryption_key_path = os.path.abspath(os.path.join(DIST_DIR, 'encryption_public_key.pem'))
-
-    # Comando para rodar o pepk.jar com caminhos absolutos
-    command = f'java -jar "{pepk_path_abs}" --keystore="{keystore}" --alias="{alias}" --output=output.zip --include-cert --rsa-aes-encryption --encryption-key-path="{encryption_key_path}" --keystore-pass="{senha_keystore}"'
-    
-    run_command(command, cwd=DIST_DIR)
-    print("Arquivo output.zip gerado com sucesso.")
-
-# Função para garantir que o diretório existe
-def ensure_dist_dir_exists():
-    abs_dist_dir = os.path.abspath(DIST_DIR)
-    if not os.path.exists(abs_dist_dir):
-        os.makedirs(abs_dist_dir)
-        print(f'Diretório {abs_dist_dir} criado com sucesso.')
-
-# Identificar o usuário atual no Windows
-env_user = get_current_user()
-print(f'O usuário atual é: {env_user}')
-
-# Verificar as dependências
-check_dependencies(env_user)
-
-# Caminho completo do keystore (usando caminho absoluto)
-ensure_dist_dir_exists()  # Verifica e cria o diretório 'dist'
-keystore_path = os.path.join(os.path.abspath(DIST_DIR), variavelcomnomedokeystore).replace("\\", "/")
-
-print(f"Gerando chave do keystore em {keystore_path}")
-# Comando para gerar a chave
-command = f'keytool -genkeypair -v -keystore "{keystore_path}" -alias canalqb -keyalg RSA -keysize 2048 -validity 10000 -storepass 278307 -dname "CN=canalqb, OU=canalqb, O=canalqb, L=Sao Paulo, ST=Sao Paulo, C=BR"'
-run_command(command, cwd=os.path.abspath(DIST_DIR))
-
-# Baixar o BundleTool
-download_bundletool()
-
-# Validar o arquivo .aab com o BundleTool
-validate_bundle(variavelcomnomedoarquivo)
-
-# Assinar o APK
-sign_apk(variavelcomnomedoarquivo, keystore_path, variavelcomalias, variavelsenha)
-
-# Validar novamente
-validate_bundle(variavelcomnomedoarquivo)
-
-# Gerar o arquivo zip com a chave de criptografia
-generate_encryption_zip(keystore_path, variavelcomalias, variavelsenha)
+print(f"Arquivos zipados com sucesso em {arquivo_zip}")

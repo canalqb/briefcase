@@ -5,6 +5,10 @@ Sempre com uma novidade em Script e soluções de problemas para você.
 Vá no canal, e comente uma duvida, estou disposto a solucionar.
 Obrigado.
 
+Video passo a passo:.
+[![Em caso de dúvidas assista esse vídeo](https://www.youtube.com/img/desktop/yt_1200.png)](https://youtu.be/1Xh_d6cEXyc)
+
+
 ## Arquivos Disponíveis
 
 - `1. R8/proguard e Symbol.py`  

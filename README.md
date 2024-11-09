@@ -5,8 +5,9 @@ Sempre com uma novidade em Script e soluções de problemas para você.
 Vá no canal, e comente uma duvida, estou disposto a solucionar.
 Obrigado.
 
-Video passo a passo:.
-[![Em caso de dúvidas assista esse vídeo](https://www.youtube.com/img/desktop/yt_1200.png)](https://youtu.be/1Xh_d6cEXyc)
+Video passo a passo:
+
+[![Em caso de dúvidas assista esse vídeo](https://i9.ytimg.com/vi/1Xh_d6cEXyc/mqdefault.jpg?v=672d6012&sqp=CIjaurkG&rs=AOn4CLBsOzNKr-6ng1DmBKZYJ-FfITtbRQ)](https://youtu.be/1Xh_d6cEXyc)
 
 
 ## Arquivos Disponíveis
